@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Sistemas de Informacion </title>
+    </h:head>
+    <h:body>
+        <p:growl id="messages" showDetail="true" />
+
+        <h:form id="frmMapa">  
+            <p:gmap 
+                id="gmap" 
+                center="-0.177061,-78.477079"  
+                zoom="15" 
+                type="ROADMAP" 
+                style="width:80%;height:400px"
+                model="#{addMarkersView.emptyModel}" 
+                onPointClick="handlePointClick(event);" 
+                widgetVar="wgMap"  >
+                <p:ajax event="overlaySelect" listener="#{addMarkersView.onMarkerSelect}" />
+                <p:gmapInfoWindow id="infoWindow">
+                    <p:outputPanel style="text-align: center; display: block; margin: auto">
+                        <p:panelGrid columns="2" >
+                            <h:outputText value="Nombre:"  />
+                            <h:outputText id="idTitle" value=" #{addMarkersView.marker.title}"  />
+                            <h:outputText value="Descripcion:"  />
+                            <h:outputText id="iddesc" value=" #{addMarkersView.marker.data.description}"  />
+                            <h:outputText value="Latitud:"  />
+                            <h:outputText id="idLat" value=" #{addMarkersView.marker.latlng.lat}"  />
+                            <h:outputText value="Longitud:"  />
+                            <h:outputText id="idLng" value=" #{addMarkersView.marker.latlng.lng}"  />
+                            <p:commandButton value="Eliminar Punto " actionListener="#{addMarkersView.removeMarket}" update=":messages"  oncomplete="markerRemoveComplete()" />
+                        </p:panelGrid>
+
+
+
+
+                        <h:form  enctype="multipart/form-data">
+                            <p:fileUpload 
+                                id="flUpImg"
+                                required="true"
+                                fileUploadListener="#{addMarkersView.fileUploadDB}" 
+                                mode="advanced" 
+                                dragDropSupport="false"
+                                update=":messages" 
+                                sizeLimit="100000" 
+                                fileLimit="3" 
+                                allowTypes="/(\.|\/)(gif|jpe?g|png)$/" 
+                                label="Subir"
+                                cancelLabel="Cancelar"
+                                uploadLabel="Subir"
+                                />
+                        </h:form>
+
+
+
+
+                    </p:outputPanel>
+                </p:gmapInfoWindow>
+
+
+
+
+            </p:gmap>
+        </h:form>
+
+        <p:dialog modal="true" widgetVar="dlgPuntos" showEffect="fade" closable="false" header="Ingrese Punto" resizable="false"> 
+            <h:form prependId="false" >
+                <p:panelGrid columns="2">
+                    <h:outputLabel for="txtTitle" value="Etiqueta:" />
+                    <p:inputText id="txtTitle" value="#{addMarkersView.title}" required="true" >
+                    </p:inputText>
+                    <h:outputLabel for="txtDesc" value="Descripcion:" />
+                    <p:inputText id="txtDesc" value="#{addMarkersView.descripcion}" required="true"/>
+                    <h:outputLabel for="flUpImg" value="Imagenes" />           
+                    <f:facet name="footer">
+                        <p:commandButton value="Agregar" actionListener="#{addMarkersView.addMarker}" update=":messages" oncomplete="markerAddComplete()" />
+                        <p:commandButton value="Cancelar" onclick="return cancel()" />
+                    </f:facet>
+                </p:panelGrid>
+                <h:inputHidden id="lat" value="#{addMarkersView.lat}" />
+                <h:inputHidden id="lng" value="#{addMarkersView.lng}" />
+            </h:form>
+        </p:dialog>
+
+
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVvfNY7nucLpK0BriRaCGT0YSAtf2LwcM" type="text/javascript"></script>
+        <script type="text/javascript">
+                            var currentMarker = null;
+
+                            function handlePointClick(event) {
+                                if (currentMarker === null) {
+                                    document.getElementById('lat').value = event.latLng.lat();
+                                    document.getElementById('lng').value = event.latLng.lng();
+
+                                    currentMarker = new google.maps.Marker({
+                                        position: new google.maps.LatLng(event.latLng.lat(), event.latLng.lng())
+                                    });
+
+                                    PF('wgMap').addOverlay(currentMarker);
+
+                                    PF('dlgPuntos').show();
+                                }
+                            }
+                            function markerAddComplete() {
+                                var title = document.getElementById('txtTitle');
+                                currentMarker.setTitle(title.value);
+                                title.value = "";
+                                currentMarker = null;
+                                PF('dlgPuntos').hide();
+                                $("#frmMapa").submit();
+                            }
+                            function markerRemoveComplete() {
+
+
+                                $("#frmMapa").submit();
+                            }
+
+                            function cancel() {
+                                PF('dlgPuntos').hide();
+                                currentMarker.setMap(null);
+                                currentMarker = null;
+
+                                return false;
+                            }
+        </script>
+    </h:body>
+</html>
+

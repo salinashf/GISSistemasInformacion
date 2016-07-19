@@ -1,0 +1,41 @@
+-- Sequence: public.puntos_seq
+
+-- DROP SEQUENCE public.puntos_seq;
+
+CREATE SEQUENCE public.puntos_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 1000
+  CACHE 1;
+
+-- Table: public.puntos
+
+-- DROP TABLE public.puntos;
+
+CREATE TABLE public.puntos
+(
+  puntos_id integer NOT NULL DEFAULT nextval('puntos_seq'::regclass),
+  nombre character varying(30),
+  punto_map geometry(Point,4326),
+  CONSTRAINT puntos_pkey PRIMARY KEY (puntos_id)
+)
+WITH (
+  OIDS=FALSE
+);
+
+
+
+CREATE TABLE public.puntos
+(
+  puntos_id integer NOT NULL DEFAULT nextval('puntos_seq'::regclass),
+  nombre character varying(30),
+  punto_map geometry(Point,4326),
+  descripcion character varying(30),
+  CONSTRAINT puntos_pkey PRIMARY KEY (puntos_id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.puntos
+  OWNER TO usergis;
