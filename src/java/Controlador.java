@@ -182,10 +182,12 @@ public class Controlador implements Serializable {
         final Connection cnx;
         try {
             cnx = BaseConexion.getConectar();
-            String insertPointSQL = "update  puntos  set  imagen_bit = ? , imagen_name = ?   where puntos_id  =1080";
+            String insertPointSQL = "update  puntos  set  imagen_bit = ? , imagen_name = ?   where puntos_id  =?";
             PreparedStatement ps = cnx.prepareStatement(insertPointSQL) ;
-            ps.setString(2, name);
+            
             ps.setBytes(1, img);
+            ps.setString(2, name);
+            ps.setInt(3, position);
             ps.executeUpdate();
             ps.close();
         } catch (SQLException ex) {
